@@ -1,0 +1,61 @@
+The Path class now implements Comparable, and therefore has a new compareTo
+method. A replacement file for Path.java is not provided, as it would overwrite
+your existing implementation. You must extend this implementation. If you would
+like a starting point, you can use this:
+
+
+public class Path implements Iterable<String>, Comparable<Path>, Serializable
+{
+
+
+...
+
+
+    /** Compares this path to another.
+
+        <p>
+        An ordering upon Path objects is provided to prevent
+        deadlocks between applications that need to lock multiple filesystem
+        objects simultaneously. By convention, paths that need to be locked
+        simultaneously are locked in increasing order.
+
+        <p>
+        Because locking a path requires locking every component along the path,
+        the order is not arbitrary. For example, suppose the paths were ordered
+        first by length, so that /etc precedes
+        /bin/cat, which precedes /etc/dfs/conf.txt.
+
+        <p>
+        Now, suppose two users are running two applications, such as two
+        instances of cp. One needs to work with /etc
+        and /bin/cat, and the other with /bin/cat and
+        /etc/dfs/conf.txt.
+
+        <p>
+        Then, if both applications follow the convention and lock paths in
+        increasing order, the following situation can occur: the first
+        application locks /etc. The second application locks
+        /bin/cat. The first application tries to lock
+        /bin/cat also, but gets blocked because the second
+        application holds the lock. Now, the second application tries to lock
+        /etc/dfs/conf.txt, and also gets blocked, because it would
+        need to acquire the lock for /etc to do so. The two
+        applications are now deadlocked.
+
+        <p>
+        As a general rule to prevent this scenario, the ordering is chosen so
+        that objects that are near each other in the path hierarchy are also
+        near each other in the ordering. That is, in the above example, there is
+        not an object such as /bin/cat between two objects that are
+        both under  /etc.
+
+        @param other The other path.
+        @return Zero if the two paths are equal, a negative number if this path
+                precedes the other path, or a positive number if this path
+                follows the other path.
+     */
+    @Override
+    public int compareTo(Path other)
+    {
+        throw new UnsupportedOperationException("not implemented");
+    }
